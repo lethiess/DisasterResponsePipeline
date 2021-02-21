@@ -1,8 +1,9 @@
 import sys
-import pandas as pd
 import numpy as np
+import pandas as pd
 from sqlalchemy import create_engine
 from collections import defaultdict
+
 
 def load_data(messages_filepath, categories_filepath):
     '''
@@ -22,7 +23,6 @@ def load_data(messages_filepath, categories_filepath):
     # merge the messages and categories data frames
     return pd.merge(messages, categories, how = "inner", on = "id")
     
-
 
 def clean_data(df):
     '''
@@ -62,9 +62,13 @@ def clean_data(df):
     # remove the original category column
     df.drop(columns="categories", axis=1, inplace=True)
     
-    # merge and return the updated input dataframe and the categories dataframe
-    return pd.merge(df, df_categories, how = "inner", on = "id")
+    # merge the updated input dataframe and the categories dataframe
+    df_merged = pd.merge(df, df_categories, how = "inner", on = "id")
+    
+    # drop duplicates
+    df_merged.drop_duplicates(inplace=True)
 
+    return df_merged
 
 
 def save_data(df, database_filename):
