@@ -125,8 +125,9 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
     # convert reports to pandas dataframe
     df_reports = pd.DataFrame(reports).T
-    df_reports_mean = df_reports.mean()
-    print(df_reports_mean)
+    df_reports = df_reports[["f1_score_0", "f1_score_1", "f1_score_macro avg", "f1_score_weighted avg"]]
+    df_report_mean = df_reports.mean()
+    print(df_report_mean)
 
 
 def save_model(model, model_filepath):
