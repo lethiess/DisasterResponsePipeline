@@ -5,16 +5,26 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Run ML pipeline",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": [".\\data\\DisasterResponse.DB",
+                     ".\\models\\DisasterResponseModel.sav"]       
+        },
+        {
             "name": "Run ETL pipeline",
             "type": "python",
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": [ ".\\data\\disaster_categories.csv",
-                      ".\\data\\disaster_messages.csv",
-                      "DisasterResponse"]
+            "args": [
+                ".\\data\\disaster_categories.csv",
+                ".\\data\\disaster_messages.csv",
+                "DisasterResponse"
+            ]
         },
-
         {
             "name": "Python: Current file",
             "type": "python",
