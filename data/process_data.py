@@ -74,6 +74,7 @@ def clean_data(df):
 def save_data(df, database_filename):
     '''
     Load the cleaned data from the a pandas dataframe into a SQLiete database.
+    The database will be stored in the data folder.
 
     Args:
         df: The pandas dataframe which should be stored in the database.
@@ -82,7 +83,7 @@ def save_data(df, database_filename):
         None.
     '''
     try:
-        engine = create_engine("sqlite:///"+database_filename+".DB")
+        engine = create_engine("sqlite:///data/"+database_filename+".DB")
         df.to_sql(database_filename, engine, if_exists="replace")  
     except:
         print("Error while writing data to SQLite-database.")
