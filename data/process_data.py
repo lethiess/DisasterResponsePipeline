@@ -71,20 +71,22 @@ def clean_data(df):
     return df_merged
 
 
-def save_data(df, database_filename):
+def save_data(df, database_filepath):
     '''
     Load the cleaned data from the a pandas dataframe into a SQLiete database.
     The database will be stored in the data folder.
 
     Args:
         df: The pandas dataframe which should be stored in the database.
-        database_filename: The name of the new database.
+        database_filepath: The file path and name of the database.
     Return:
         None.
     '''
     try:
-        engine = create_engine("sqlite:///data/"+database_filename+".DB")
-        df.to_sql(database_filename, engine, if_exists="replace")  
+        engine = create_engine("sqlite:///" + database_filepath)
+        # extract the name of the database without file extension or path
+        database_name = database_filepath.rsplit("\\",1)[1].split(".")[0]
+        df.to_sql(database_name, engine, if_exists="replace")  
     except:
         print("Error while writing data to SQLite-database.")
 

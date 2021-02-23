@@ -4,6 +4,7 @@ import pickle
 
 import nltk
 import pandas as pd
+import numpy as np
 from sqlalchemy import create_engine
 
 from nltk.tokenize import word_tokenize
@@ -18,23 +19,31 @@ from sklearn.metrics import classification_report
 
 
 
-def load_data(database_filepath):
+def load_data(database_filepath, random_drop = False, random_drop_percentace = 0.75):
     '''
     Load data from a datebase and split it into variables
     for training a machine learning model. The data in the
     database is the preprocessed data from the ETL pipeline.
 
     Args:
-        database_filename: The filepath and name of the database.
-
+        database_filepath: The filepath and name of the database.
+        random_drop:       Optional parameter flag for randomly drop rows.
+        random_drop_percentage: Optional parameter which defines how many rows will be dropped.
     Returns:
         X: This pandas series contrains all messages.
         Y: This pandas series contrains the response to X.
         categories: This list contains all categories of Y.
     '''
     # open database and read data to a pandas dataframe
-    engine = create_engine("sqlite:///"+database_filepath)
-    df = pd.read_sql("SELECT * FROM DisasterResponse", engine)
+    engine = create_engine("sqlite:///" + database_filepath)
+    database_name = database_filepath.rsplit("\\",1)[1].split(".")[0]
+    df = pd.read_sql("SELECT * FROM " + database_name, engine)
+
+    # for test purposes on the ML pipeline it is useful to shrink the dataset
+    if random_drop:
+        drop_n = int(df.shape[0] * random_drop_percentace)
+        drop_indices = np.random.choice(df.index, drop_n, replace = False)
+        df = df.drop(drop_indices)
 
     # split dataframe in predictor and outcome variables    
     X = df["message"]   
@@ -76,7 +85,7 @@ def build_model():
         None
     
     Returns:
-        The pipeline of the model.
+        
     '''
     # text processing and model pipeline
     pipeline = Pipeline([
@@ -86,9 +95,16 @@ def build_model():
     ])
 
     # define parameters for GridSearchCV
-    # create gridsearch object and return as final model pipeline
+    parameters = {
+            'vect__max_df': (0.5, 0.75, 1.0),
+            'vect__min_df': (0.1, 0.25, 0.5),
+            'vect__ngram_range': ((1, 1), (1, 2), (2, 2)), 
+            'vect__max_features': (None, 5000, 10000, 50000),
+            'clf__estimator__n_estimators': [100, 200]
+        }
 
-    return pipeline
+    # create gridsearch object and return as final model pipeline
+    return GridSearchCV(pipeline, param_grid=parameters)
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
@@ -107,21 +123,22 @@ def evaluate_model(model, X_test, Y_test, category_names):
         None
     '''
     # predict 
-    Y_pred = pd.Dataframe(pipeline.predict(X_test))
+    Y_pred = pd.DataFrame(pipeline.predict(X_test))
+    Y_pred.columns = category_names
 
     # evaluate each predicted category
     reports = {}
     for category in category_names:
-        output = classification_report(Y_test[category], Y_pred_df[category], output_dict=True)
+        report = classification_report(Y_test[category], Y_pred[category], output_dict = True)
         
         reports[category] = {}
-        for out in output:
-            if out == "accuracy":
-                reports[category]["accuracy"] = output[category]
+        for var in report:
+            if var == "accuracy":
+                reports[category]["accuracy"] = report[var]
             else:
-                reports[category]["f1_score_"+out] = output[category]["f1-score"]
-                reports[category]["precision_"+out] = output[category]["precision"]
-                reports[category]["recall_"+out] = output[category]["recall"]
+                reports[category]["f1_score_" + var] = report[var]["f1-score"]
+                reports[category]["precision_" + var] = report[var]["precision"]
+                reports[category]["recall_" + var] = report[var]["recall"]
 
     # convert reports to pandas dataframe
     df_reports = pd.DataFrame(reports).T
@@ -141,12 +158,19 @@ def save_model(model, model_filepath):
     Returns:
 
     '''
-    pickle.dump(model, open(filename, "wb"))
+    pickle.dump(model, open(model_filepath, "wb"))
 
 
 def main():
-    # download the required nltk packages
-    nltk.download(["punkt", "wordnet"])
+    '''
+    Run the Machine Learning Pipeline.
+    '''
+    # download the required nltk packages if not available
+    try:
+        nltk.data.find('tokenizers/punkt')
+        nltk.data.find('tokenizers/wordnet')
+    except LookupError:
+        nltk.download(["punkt", "wordnet"])
 
     # check if the number of arguments are correct
     if len(sys.argv) == 3:
