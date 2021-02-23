@@ -11,7 +11,7 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "args": [".\\data\\DisasterResponse.DB",
-                     ".\\models\\DisasterResponseModel.sav"]       
+                     ".\\models\\DisasterResponseModel.pkl"]       
         },
         {
             "name": "Run ETL pipeline",
@@ -22,7 +22,7 @@
             "args": [
                 ".\\data\\disaster_categories.csv",
                 ".\\data\\disaster_messages.csv",
-                "DisasterResponse"
+                ".\\data\\DisasterResponse.DB"
             ]
         },
         {
