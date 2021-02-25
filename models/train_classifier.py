@@ -11,6 +11,7 @@ from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GridSearchCV
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, TfidfVectorizer
@@ -79,13 +80,14 @@ def tokenize(text):
 def build_model():
     '''
     Building a machine leanring model using 
-    sklearn's pipeline.
+    sklearn's pipeline and Gridsearch for optimal
+    parameters.
 
     Args:
         None
     
     Returns:
-        
+        A gridsearch object of the ML pipeline.
     '''
     # text processing and model pipeline
     pipeline = Pipeline([
@@ -104,7 +106,7 @@ def build_model():
         }
 
     # create gridsearch object and return as final model pipeline
-    return GridSearchCV(pipeline, param_grid=parameters)
+    return GridSearchCV(pipeline, param_grid=parameters, n_jobs = 3, verbose=3)
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
@@ -123,7 +125,7 @@ def evaluate_model(model, X_test, Y_test, category_names):
         None
     '''
     # predict 
-    Y_pred = pd.DataFrame(pipeline.predict(X_test))
+    Y_pred = pd.DataFrame(model.predict(X_test))
     Y_pred.columns = category_names
 
     # evaluate each predicted category
@@ -149,14 +151,15 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 def save_model(model, model_filepath):
     '''
-
+    Save the model as a pickle file, so it can be used again
+    without new training.
 
     Args:
         model:
         model_filepath:
     
     Returns:
-
+        None
     '''
     pickle.dump(model, open(model_filepath, "wb"))
 
@@ -176,7 +179,7 @@ def main():
     if len(sys.argv) == 3:
         database_filepath, model_filepath = sys.argv[1:]
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
-        X, Y, category_names = load_data(database_filepath)
+        X, Y, category_names = load_data(database_filepath, True, 0.9)
         X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)
         
         print('Building model...')
@@ -188,8 +191,11 @@ def main():
         print('Evaluating model...')
         evaluate_model(model, X_test, Y_test, category_names)
 
-        #print('Saving model...\n    MODEL: {}'.format(model_filepath))
-        #save_model(model, model_filepath)
+        print('Model parameters:')
+        print(model.best_params_)
+
+        print('Saving model...\n    MODEL: {}'.format(model_filepath))
+        save_model(model, model_filepath)
 
         print('Trained model saved!')
 
