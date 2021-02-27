@@ -20,8 +20,8 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "args": [
-                ".\\data\\disaster_categories.csv",
                 ".\\data\\disaster_messages.csv",
+                ".\\data\\disaster_categories.csv",
                 ".\\data\\DisasterResponse.DB"
             ]
         },
