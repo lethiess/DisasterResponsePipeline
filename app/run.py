@@ -8,6 +8,7 @@ from nltk.tokenize import word_tokenize
 from flask import Flask
 from flask import render_template, request, jsonify
 from plotly.graph_objs import Bar
+from plotly.graph_objs import Pie
 import joblib
 from sqlalchemy import create_engine
 
@@ -43,16 +44,39 @@ def index():
     # extract data needed for visuals
     # TODO: Below is an example - modify to extract data for your own visuals
     genre_counts = df.groupby('genre').count()['message']
-    genre_names = list(genre_counts.index)
+    genre_names = list(genre_counts.index.str.capitalize())
     
+
+    category_sum = df.iloc[: , 5:].sum()
+    category_name = df.iloc[: , 5:].columns.str.replace("_", "").str.capitalize()
+
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
     graphs = [
         {
             'data': [
                 Bar(
-                    x=genre_names,
-                    y=genre_counts
+                    x = category_name,
+                    y = category_sum
+                )
+            ],
+
+            'layout': {
+                'title': 'Distribution of Disaster Categories',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Category",
+                    'tickangle': 33
+                }
+            }
+        },
+        {
+            'data': [
+                Bar(
+                    x = genre_names,
+                    y = genre_counts
                 )
             ],
 
@@ -66,6 +90,7 @@ def index():
                 }
             }
         }
+
     ]
     
     # encode plotly graphs in JSON
