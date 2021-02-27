@@ -97,8 +97,8 @@ def build_model():
 
     # define parameters for GridSearchCV
     parameters = {
-            'clf__estimator__n_estimators': [10, 50, 100, 200, 300],
-            'clf__estimator__learning_rate': [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75]
+            'clf__estimator__n_estimators': [25, 50, 75, 100, 200],
+            'clf__estimator__learning_rate': [0.25, 0.5, 0.75, 1.0]
         }
 
 
