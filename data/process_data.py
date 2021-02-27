@@ -4,6 +4,26 @@ import pandas as pd
 from sqlalchemy import create_engine
 from collections import defaultdict
 
+def getFileName(filepath):
+    '''
+    Extract the file name from the file path. This includes
+    removing the path and the file extension.
+
+    Args:
+        database_filepath: The path to the file 
+
+    Return:
+        Name of the Database without path and file extension.
+    '''
+    file_name = ""
+    # split path from file name
+    try:
+        file_name = filepath.rsplit("\\",1)[1]
+    except:
+        file_name = filepath
+    # split file extension and return name 
+    return file_name.split(".")[0]
+
 
 def load_data(messages_filepath, categories_filepath):
     '''
@@ -84,9 +104,7 @@ def save_data(df, database_filepath):
     '''
     try:
         engine = create_engine("sqlite:///" + database_filepath)
-        # extract the name of the database without file extension or path
-        database_name = database_filepath.rsplit("\\",1)[1].split(".")[0]
-        df.to_sql(database_name, engine, if_exists="replace")  
+        df.to_sql(getFileName(database_filepath), engine, if_exists="replace")  
     except:
         print("Error while writing data to SQLite-database.")
 

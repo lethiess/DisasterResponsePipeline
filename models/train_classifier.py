@@ -1,12 +1,11 @@
 import sys
 from collections import defaultdict 
-import pickle
-
-import nltk
 import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine
+import pickle
 
+import nltk
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 
@@ -15,10 +14,11 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, TfidfVectorizer
+from sklearn.ensemble import AdaBoostClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
 
-
+from data.process_data import getFileName
 
 def load_data(database_filepath, random_drop = False, random_drop_percentace = 0.75):
     '''
@@ -37,8 +37,7 @@ def load_data(database_filepath, random_drop = False, random_drop_percentace = 0
     '''
     # open database and read data to a pandas dataframe
     engine = create_engine("sqlite:///" + database_filepath)
-    database_name = database_filepath.rsplit("\\",1)[1].split(".")[0]
-    df = pd.read_sql("SELECT * FROM " + database_name, engine)
+    df = pd.read_sql("SELECT * FROM " + getFileName(database_filepath), engine)
 
     # for test purposes on the ML pipeline it is useful to shrink the dataset
     if random_drop:
@@ -93,17 +92,15 @@ def build_model():
     pipeline = Pipeline([
         ("vect", CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
-        ("clf", MultiOutputClassifier(RandomForestClassifier()))
+        ("clf", MultiOutputClassifier(AdaBoostClassifier()))
     ])
 
     # define parameters for GridSearchCV
     parameters = {
-            'vect__max_df': (0.5, 0.75, 1.0),
-            'vect__min_df': (0.1, 0.25, 0.5),
-            'vect__ngram_range': ((1, 1), (1, 2), (2, 2)), 
-            'vect__max_features': (None, 5000, 10000, 50000),
-            'clf__estimator__n_estimators': [100, 200]
+            'clf__estimator__n_estimators': [10, 50, 100, 200, 300],
+            'clf__estimator__learning_rate': [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75]
         }
+
 
     # create gridsearch object and return as final model pipeline
     return GridSearchCV(pipeline, param_grid=parameters, n_jobs = 3, verbose=3)
@@ -179,8 +176,8 @@ def main():
     if len(sys.argv) == 3:
         database_filepath, model_filepath = sys.argv[1:]
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
-        X, Y, category_names = load_data(database_filepath, True, 0.9)
-        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)
+        X, Y, category_names = load_data(database_filepath)
+        X_train, X_test, Y_train, Y_test = train_test_split(X, Y)
         
         print('Building model...')
         model = build_model()
