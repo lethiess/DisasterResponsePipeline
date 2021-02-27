@@ -54,7 +54,7 @@ def clean_data(df):
         # store/update the values in a dictionry
         d["id"].append(df["id"][i])
         for category in category_value_list:
-            d[category[0]].append(category[1])
+            d[category[0]].append(int(category[1]))
 
     # create a new dataframe based on the category dict
     df_categories = pd.DataFrame(d)

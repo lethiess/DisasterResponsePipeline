@@ -49,7 +49,7 @@ def load_data(database_filepath, random_drop = False, random_drop_percentace = 0
 
     # split dataframe in predictor and outcome variables    
     X = df["message"]   
-    Y = df.iloc[: , 4:]     
+    Y = df.iloc[: , 5:]     
     categories = Y.columns
 
     return X, Y, categories
@@ -105,7 +105,7 @@ def build_model():
 
 
     # create gridsearch object and return as final model pipeline
-    return GridSearchCV(pipeline, param_grid=parameters, n_jobs = 3, verbose=3)
+    return GridSearchCV(pipeline, param_grid=parameters, n_jobs = -1, verbose = 3)
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
@@ -194,7 +194,7 @@ def main():
         print(model.best_params_)
 
         print('Saving model...\n    MODEL: {}'.format(model_filepath))
-        #save_model(model, model_filepath)
+        save_model(model, model_filepath)
 
         print('Trained model saved!')
 
