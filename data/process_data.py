@@ -1,9 +1,9 @@
 import sys
 import numpy as np
 import pandas as pd
-from sqlalchemy import create_engine
+import re
 from collections import defaultdict
-from my_utils import getFileName
+from sqlalchemy import create_engine
 
 def load_data(messages_filepath, categories_filepath):
     '''
@@ -84,7 +84,8 @@ def save_data(df, database_filepath):
     '''
     try:
         engine = create_engine("sqlite:///" + database_filepath)
-        df.to_sql(getFileName(database_filepath), engine, if_exists="replace")  
+        db_name = re.findall(r"[^\\/]+(?=\.)",database_filepath)[0]
+        df.to_sql(db_name, engine, if_exists="replace")  
     except:
         print("Error while writing data to SQLite-database.")
 

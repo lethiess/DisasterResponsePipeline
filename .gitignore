@@ -1,6 +1,10 @@
 # project files
 .vscode/settings.json
 
+# ML models and Databases
+*.DB
+*.pkl
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

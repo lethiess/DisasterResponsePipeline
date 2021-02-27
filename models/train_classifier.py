@@ -1,14 +1,16 @@
 import sys
+import re
 from collections import defaultdict 
 import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine
+# import pickle for saving ML models
 import pickle
-
+# import natural language toolkit packages
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
-
+# import scikit-learn packages
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
 from sklearn.multioutput import MultiOutputClassifier
@@ -17,26 +19,6 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, T
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
-
-def getFileName(filepath):
-    '''
-    Extract the file name from the file path. This includes
-    removing the path and the file extension.
-
-    Args:
-        database_filepath: The path to the file 
-
-    Return:
-        Name of the Database without path and file extension.
-    '''
-    file_name = ""
-    # split path from file name
-    try:
-        file_name = filepath.rsplit("\\",1)[1]
-    except:
-        file_name = filepath
-    # split file extension and return name 
-    return file_name.split(".")[0]
 
 
 def load_data(database_filepath, random_drop = False, random_drop_percentace = 0.75):
@@ -56,7 +38,8 @@ def load_data(database_filepath, random_drop = False, random_drop_percentace = 0
     '''
     # open database and read data to a pandas dataframe
     engine = create_engine("sqlite:///" + database_filepath)
-    df = pd.read_sql("SELECT * FROM " + getFileName(database_filepath), engine)
+    db_name = re.findall(r"[^\\/]+(?=\.)",database_filepath)[0]
+    df = pd.read_sql("SELECT * FROM " + db_name, engine)
 
     # for test purposes on the ML pipeline it is useful to shrink the dataset
     if random_drop:
@@ -211,7 +194,7 @@ def main():
         print(model.best_params_)
 
         print('Saving model...\n    MODEL: {}'.format(model_filepath))
-        save_model(model, model_filepath)
+        #save_model(model, model_filepath)
 
         print('Trained model saved!')
 
