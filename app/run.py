@@ -1,7 +1,7 @@
 import json
 import plotly
 import pandas as pd
-
+import random
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 
@@ -35,29 +35,41 @@ df = pd.read_sql_table(db_name, engine)
 model_name = "DisasterResponseModel"
 model = joblib.load("../models/" + model_name + ".pkl")
 
+# color lists
+colorlist_gerne = None
+colorlist_category = None
 
 # index webpage displays cool visuals and receives user input text for model
 @app.route('/')
 @app.route('/index')
 def index():
-    
-    # extract data needed for visuals
-    # TODO: Below is an example - modify to extract data for your own visuals
+
+    #genres
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index.str.capitalize())
-    
+    global colorlist_gerne
+    if not colorlist_gerne:
+        # inspiration for the random colorlist 
+        # https://stackoverflow.com/questions/28999287/generate-random-colors-rgb/50218895
+        colorlist_gerne = ["#"+''.join([random.choice('0123456789ABCDEF')
+                            for j in range(6)]) for i in range(len(genre_names))]
 
+    # extract data needed for visuals: categories
     category_sum = df.iloc[: , 5:].sum()
-    category_name = df.iloc[: , 5:].columns.str.replace("_", "").str.capitalize()
+    category_name = df.iloc[: , 5:].columns.str.replace("_", " ").str.capitalize()
+    global colorlist_category
+    if not colorlist_category:
+        colorlist_category = ["#"+''.join([random.choice('0123456789ABCDEF') 
+                             for j in range(6)]) for i in range(len(category_name))] 
 
     # create visuals
-    # TODO: Below is an example - modify to create your own visuals
     graphs = [
         {
             'data': [
                 Bar(
                     x = category_name,
-                    y = category_sum
+                    y = category_sum,
+                    marker = dict(color = colorlist_category)
                 )
             ],
 
@@ -76,7 +88,8 @@ def index():
             'data': [
                 Bar(
                     x = genre_names,
-                    y = genre_counts
+                    y = genre_counts,
+                    marker = dict(color = colorlist_gerne)
                 )
             ],
 
@@ -120,7 +133,7 @@ def go():
 
 
 def main():
-    app.run(host='0.0.0.0', port=3001, debug=True)
+    app.run(host='127.0.0.1', port=3001, debug=True)
 
 
 if __name__ == '__main__':
