@@ -38,8 +38,8 @@ def load_data(database_filepath, random_drop = False, random_drop_percentace = 0
     '''
     # open database and read data to a pandas dataframe
     engine = create_engine("sqlite:///" + database_filepath)
-    db_name = re.findall(r"[^\\/]+(?=\.)",database_filepath)[0]
-    df = pd.read_sql("SELECT * FROM " + db_name, engine)
+    db_name = re.findall(r"[^\\/]+(?=\.)",database_filepath)
+    df = pd.read_sql("SELECT * FROM " + db_name[len(db_name)-1], engine)
 
     # for test purposes on the ML pipeline it is useful to shrink the dataset
     if random_drop:
@@ -106,7 +106,6 @@ def build_model():
 
     # create gridsearch object and return as final model pipeline
     return GridSearchCV(pipeline, param_grid=parameters, n_jobs = -1, verbose = 3)
-
 
 def evaluate_model(model, X_test, Y_test, category_names):
     '''
