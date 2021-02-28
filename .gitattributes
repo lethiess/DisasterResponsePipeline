@@ -1,3 +1,4 @@
 data/disaster_categories.csv filter=lfs diff=lfs merge=lfs -text
 data/disaster_messages.csv filter=lfs diff=lfs merge=lfs -text
 models/DisasterResponseModel.pkl filter=lfs diff=lfs merge=lfs -text
+data/DisasterResponse.DB filter=lfs diff=lfs merge=lfs -text
