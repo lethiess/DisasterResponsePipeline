@@ -43,24 +43,24 @@ colorlist_category = None
 @app.route('/')
 @app.route('/index')
 def index():
+    # inspiration for the random colorlist 
+    # https://stackoverflow.com/questions/28999287/generate-random-colors-rgb/50218895
+    get_n_colors = lambda n : ["#"+''.join([random.choice('0123456789ABCDEF')
+                            for j in range(6)]) for i in range(n)]
 
     #genres
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index.str.capitalize())
     global colorlist_gerne
     if not colorlist_gerne:
-        # inspiration for the random colorlist 
-        # https://stackoverflow.com/questions/28999287/generate-random-colors-rgb/50218895
-        colorlist_gerne = ["#"+''.join([random.choice('0123456789ABCDEF')
-                            for j in range(6)]) for i in range(len(genre_names))]
+        colorlist_gerne = get_n_colors(len(genre_names))
 
     # extract data needed for visuals: categories
     category_sum = df.iloc[: , 5:].sum()
     category_name = df.iloc[: , 5:].columns.str.replace("_", " ").str.capitalize()
     global colorlist_category
     if not colorlist_category:
-        colorlist_category = ["#"+''.join([random.choice('0123456789ABCDEF') 
-                             for j in range(6)]) for i in range(len(category_name))] 
+        colorlist_category = get_n_colors(len(category_name))
 
     # create visuals
     graphs = [
