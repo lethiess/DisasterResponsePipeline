@@ -45,21 +45,27 @@ conda env create -f environment.yml
 ### Run the ETL Pipeline
 
 Open a terminal in the ```data``` directory and run:
-```python process_data.py disaster_messages.csv disaster_categories.csv DisasterResponse.DB```
+```
+python process_data.py disaster_messages.csv disaster_categories.csv DisasterResponse.DB
+```
 
 Alternatively you can use VS Code and the provided launchfile for a convenient workflow [(more information)](#vscode).
 
 ### Run the ML Pipeline
 
 Open a terminal in the ```models``` directory and run:
-```python train_classifier.py DisasterResponse.DB DisasterResponseModel.pkl```
+```
+python train_classifier.py ../data/DisasterResponse.DB DisasterResponseModel.pkl
+```
 
 Alternatively you can use VS Code and the provided launchfile for a convenient workflow [(more information)](#vscode).
 
 ### Run the webapp
 
 Open a terminal in the ```app``` directory and run:
- ```python run.py ```.
+ ```
+ python run.py 
+ ```
 
 After a successful server startup, open a browser and type in following address: [http://127.0.0.1:3001/](http://127.0.0.1:3001/).
 
