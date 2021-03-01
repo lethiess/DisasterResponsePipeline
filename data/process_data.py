@@ -58,7 +58,11 @@ def clean_data(df):
 
     # create a new dataframe based on the category dict
     df_categories = pd.DataFrame(d)
-    
+ 
+    # drop invalid category values (only binary values (0,1) are allowed)
+    for category in df_categories.columns[1:]:
+        df_categories.drop(df_categories.loc[df_categories[category]==2].index, inplace=True)
+
     # remove the original category column
     df.drop(columns="categories", axis=1, inplace=True)
     
@@ -67,7 +71,7 @@ def clean_data(df):
     
     # drop duplicates
     df_merged.drop_duplicates(inplace=True)
-
+ 
     return df_merged
 
 
