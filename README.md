@@ -2,7 +2,7 @@
 
 This project is part of Udacity's Data Scientist Nanodegree program. There are two given datasets, one provides social media or newspaper messages of people in need and the other dataset provides the corresponding category of help needed.
 
-These two datasets are processed with an ETL pipeline and afterwards the resulting databse is used for generating a machine learning model. This model is used for a webapp, where you can classify messages in disaster categories. 
+These two datasets are processed with an ETL pipeline and afterwards the resulting database is used for generating a machine learning model. This model is used for a web app, where you can classify messages in disaster categories. 
 
 ### Installation
 
@@ -26,7 +26,7 @@ git clone git@github.com:lethiess/DisasterResponsePipeline.git
 
 ### Prerequisites
 
-All parts of this project are based on **Python 3**. There are some additinal requirements for the ETL and ML Pipeline and the webapp. You need to install the following python packages:
+All parts of this project are based on **Python 3**. There are some additinal requirements for the ETL and ML Pipeline and the web app. You need to install the following python packages:
 - flask
 - numpy
 - pandas
@@ -60,7 +60,7 @@ python train_classifier.py ../data/DisasterResponse.DB DisasterResponseModel.pkl
 
 Alternatively you can use VS Code and the provided launchfile for a convenient workflow [(more information)](#vscode).
 
-### Run the webapp
+### Run the web app
 
 Open a terminal in the ```app``` directory and run:
  ```
